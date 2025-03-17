@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vector search + Multimodal Embeddings</title>
+  <!-- Favicon -->
+  <link rel="icon" href="assets/icon/loading-icon.png" type="image/png">
+  <link rel="shortcut icon" href="assets/icon/loading-icon.png" type="image/png">
+  <!-- Fonte Outfit -->
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Tela de carregamento inicial (Splash Screen) -->
+  <div id="splashScreen" class="splash-screen">
+    <div class="splash-content">
+      <img src="assets/icon/loading-icon.png" alt="Carregando" class="splash-icon">
+      <div class="splash-spinner"></div>
+    </div>
+  </div>
+
+  <!-- Seletor de idioma -->
+  <div class="language-selector" id="languageSelector">
+    <div class="language-option active" data-lang="pt-BR">PT</div>
+    <div class="language-option" data-lang="en">EN</div>
+  </div>
+
+  <!-- Botão de alternância de tema -->
+  <div class="theme-toggle" id="themeToggle">
+    <!-- Ícone de lua/sol para tema escuro/claro -->
+    <svg xmlns="http://www.w3.org/2000/svg" id="moonIcon" viewBox="0 0 24 24">
+      <path d="M12 11.807A9.002 9.002 0 0 1 10.049 2a9.942 9.942 0 0 0-5.12 2.735c-3.905 3.905-3.905 10.237 0 14.142 3.906 3.906 10.237 3.905 14.143 0a9.946 9.946 0 0 0 2.735-5.119A9.003 9.003 0 0 1 12 11.807z"/>
+    </svg>
+    <svg xmlns="http://www.w3.org/2000/svg" id="sunIcon" viewBox="0 0 24 24" style="display:none;">
+      <path d="M6.995 12c0 2.761 2.244 5.005 5.005 5.005s5.005-2.244 5.005-5.005-2.244-5.005-5.005-5.005S6.995 9.239 6.995 12zM11 19h2v3h-2zm0-17h2v3h-2zm-9 9h3v2H2zm17 0h3v2h-3zM5.637 19.778l-1.414-1.414 2.121-2.121 1.414 1.414zM16.242 6.344l2.122-2.122 1.414 1.414-2.122 2.122zM6.344 7.759 4.223 5.637l1.415-1.414 2.12 2.122zm13.434 10.605-1.414 1.414-2.122-2.122 1.414-1.414z"/>
+    </svg>
+  </div>
+
+  <div class="container">
+    <!-- Carrossel automático de vídeos - estilo deslizante simplificado -->
+    <div class="carousel-container">
+      <div class="carousel" id="videoCarousel">
+        <div class="carousel-item">
+          <video src="assets/video1.mp4" muted loop playsinline></video>
+        </div>
+        <div class="carousel-item active">
+          <video src="assets/video2.mp4" autoplay muted loop playsinline></video>
+        </div>
+        <div class="carousel-item">
+          <video src="assets/video3.mp4" muted loop playsinline></video>
+        </div>
+      </div>
+      
+      <div class="carousel-indicators">
+        <span class="indicator" data-index="0"></span>
+        <span class="indicator active" data-index="1"></span>
+        <span class="indicator" data-index="2"></span>
+      </div>
+    </div>
+    
+    <!-- Título do projeto -->
+    <h1 id="mainTitle">Vector search + Multimodal Embeddings</h1>
+
+    <!-- Texto explicativo em tom casual -->
+    <div class="description">
+      <p id="descriptionText">Digite o que você lembra sobre o vídeo e nós o encontraremos para você</p>
+    </div>
+
+    <!-- Campo de pesquisa -->
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Digite o que você lembra sobre o vídeo...">
+      <div class="search-icon" onclick="startSearch()">
+        <!-- Ícone de lupa (SVG) -->
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#fff" viewBox="0 0 24 24">
+          <path d="M21.53 20.47l-5.13-5.13a7.5 7.5 0 10-1.06 1.06l5.13 5.13a.75.75 0 101.06-1.06zM10.5 17a6.5 6.5 0 110-13 6.5 6.5 0 010 13z"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Área de carregamento -->
+    <div id="loadingArea" class="loading">
+      <div class="spinner"></div>
+      <p id="loadingText">Procurando o seu vídeo...</p>
+    </div>
+
+    <!-- Área de exibição de resultados -->
+    <div id="resultArea" class="result-area">
+      <h2 id="resultTitle">Resultados da sua busca</h2>
+      <div class="video-grid" id="videoGrid">
+        <!-- Os cards de vídeo serão adicionados via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Referência ao arquivo JavaScript externo -->
+  <script src="javascript/main.js"></script>
+</body>
+</html>

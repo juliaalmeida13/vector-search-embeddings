@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vector search + Multimodal Embeddings</title>
   <!-- Favicon -->
-  <link rel="icon" href="assets/icon/loading-icon.png" type="image/png">
-  <link rel="shortcut icon" href="assets/icon/loading-icon.png" type="image/png">
+  <link rel="icon" href="assets/images/loading-icon.png" type="image/png">
+  <link rel="shortcut icon" href="assets/images/loading-icon.png" type="image/png">
   <!-- Fonte Outfit -->
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
@@ -15,7 +15,7 @@
   <!-- Tela de carregamento inicial (Splash Screen) -->
   <div id="splashScreen" class="splash-screen">
     <div class="splash-content">
-      <img src="assets/icon/loading-icon.png" alt="Carregando" class="splash-icon">
+      <img src="assets/images/loading-icon.png" alt="Carregando" class="splash-icon">
       <div class="splash-spinner"></div>
     </div>
   </div>
@@ -38,51 +38,44 @@
   </div>
 
   <div class="container">
-    <!-- Carrossel automático de vídeos - estilo deslizante simplificado -->
-    <div class="carousel-container">
-      <div class="carousel" id="videoCarousel">
-        <div class="carousel-item">
-          <video src="assets/video1.mp4" muted loop playsinline></video>
+    <section class="video-section">
+      <div class="carousel-container">
+        <div class="carousel-track">
+          <div class="carousel-item">
+            <video src="assets/videos/video1.mp4" muted></video>
+          </div>
+          <div class="carousel-item">
+            <video src="assets/videos/video2.mp4" muted></video>
+          </div>
+          <div class="carousel-item">
+            <video src="assets/videos/video3.mp4" muted></video>
+          </div>
         </div>
-        <div class="carousel-item active">
-          <video src="assets/video2.mp4" autoplay muted loop playsinline></video>
-        </div>
-        <div class="carousel-item">
-          <video src="assets/video3.mp4" muted loop playsinline></video>
+        <div class="carousel-indicators">
+          <span class="indicator"></span>
+          <span class="indicator"></span>
+          <span class="indicator"></span>
         </div>
       </div>
       
-      <div class="carousel-indicators">
-        <span class="indicator" data-index="0"></span>
-        <span class="indicator active" data-index="1"></span>
-        <span class="indicator" data-index="2"></span>
-      </div>
-    </div>
-    
-    <!-- Título do projeto -->
-    <h1 id="mainTitle">Vector search + Multimodal Embeddings</h1>
-
-    <!-- Texto explicativo em tom casual -->
-    <div class="description">
+      <h2 id="mainTitle">Vector search + Multimodal Embeddings</h2>
       <p id="descriptionText">Digite o que você lembra sobre o vídeo e nós o encontraremos para você</p>
-    </div>
-
-    <!-- Campo de pesquisa -->
-    <div class="search-container">
-      <input type="text" id="searchInput" placeholder="Digite o que você lembra sobre o vídeo...">
-      <div class="search-icon" onclick="startSearch()">
-        <!-- Ícone de lupa (SVG) -->
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#fff" viewBox="0 0 24 24">
-          <path d="M21.53 20.47l-5.13-5.13a7.5 7.5 0 10-1.06 1.06l5.13 5.13a.75.75 0 101.06-1.06zM10.5 17a6.5 6.5 0 110-13 6.5 6.5 0 010 13z"/>
-        </svg>
+      
+      <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Digite o que você lembra sobre o vídeo...">
+        <div class="search-icon" onclick="startSearch()">
+          <!-- Ícone de lupa (SVG) -->
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="#fff" viewBox="0 0 24 24">
+            <path d="M21.53 20.47l-5.13-5.13a7.5 7.5 0 10-1.06 1.06l5.13 5.13a.75.75 0 101.06-1.06zM10.5 17a6.5 6.5 0 110-13 6.5 6.5 0 010 13z"/>
+          </svg>
+        </div>
       </div>
-    </div>
-
-    <!-- Área de carregamento -->
-    <div id="loadingArea" class="loading">
-      <div class="spinner"></div>
-      <p id="loadingText">Procurando o seu vídeo...</p>
-    </div>
+      
+      <div id="loadingArea" class="loading">
+        <div class="spinner"></div>
+        <p id="loadingText">Procurando o seu vídeo...</p>
+      </div>
+    </section>
 
     <!-- Área de exibição de resultados -->
     <div id="resultArea" class="result-area">

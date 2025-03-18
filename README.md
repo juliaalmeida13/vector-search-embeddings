@@ -6,7 +6,7 @@ This project demonstrates a modern interface for semantic vector search and mult
 
 The interface showcases how vector search can be used to retrieve videos based on the semantic meaning of user queries, not just exact keyword matches. It simulates a production environment where video content can be discovered through natural language descriptions.
 
-![Interface Screenshot](assets/screenshot.png)
+![Interface Screenshot](assets/images/screenshot.png)
 
 ## Features
 
@@ -85,9 +85,13 @@ vector-search-project/
 ├── javascript/
 │   └── main.js         # Application logic and simulated API
 └── assets/
-    ├── video1.mp4      # Sample video content
-    ├── video2.mp4      # Sample video content
-    └── video3.mp4      # Sample video content
+    ├── images/         # Image assets
+    │   ├── loading-icon.png  # Loading indicator and favicon
+    │   └── screenshot.png    # Project screenshot
+    └── videos/         # Video content
+        ├── video1.mp4  # Sample video content
+        ├── video2.mp4  # Sample video content
+        └── video3.mp4  # Sample video content
 ```
 
 ## Future Improvements

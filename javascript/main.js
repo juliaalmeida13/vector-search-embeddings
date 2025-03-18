@@ -118,47 +118,96 @@ function toggleTheme() {
 // Adicionar evento de clique para alternar o tema
 themeToggle.addEventListener('click', toggleTheme);
 
-// Carrossel automático simplificado
+// Carrossel com rotação posicional (centro → esquerda → direita → centro)
 let currentSlide = 1; // Começamos com o segundo item (índice 1) ativo
 const carouselItems = document.querySelectorAll('.carousel-item');
 const indicators = document.querySelectorAll('.indicator');
 const totalSlides = carouselItems.length;
 
-function showSlide(index) {
-  // Remove a classe active de todos os slides e indicadores
+// Posições para os vídeos (0 = esquerda, 1 = centro, 2 = direita)
+let positions = [0, 1, 2]; // Inicialmente, slide 0 está à esquerda, 1 no centro, 2 à direita
+
+function updateCarouselPositions() {
+  // Remover todas as classes de posição existentes
   carouselItems.forEach(item => {
-    item.classList.remove('active');
+    item.classList.remove('position-left', 'position-center', 'position-right');
     const video = item.querySelector('video');
     video.pause();
   });
   
-  indicators.forEach(dot => {
-    dot.classList.remove('active');
-  });
-  
-  // Adiciona a classe active no slide e indicador selecionados
-  carouselItems[index].classList.add('active');
-  indicators[index].classList.add('active');
-  
-  // Reproduz o vídeo do slide ativo
-  const currentVideo = carouselItems[index].querySelector('video');
-  currentVideo.currentTime = 0;
-  currentVideo.play();
-  
-  // Atualiza o índice atual
-  currentSlide = index;
+  // Aplicar as novas classes de posição
+  for (let i = 0; i < totalSlides; i++) {
+    if (positions[i] === 0) {
+      carouselItems[i].classList.add('position-left');
+    } else if (positions[i] === 1) {
+      carouselItems[i].classList.add('position-center', 'active');
+      // Reproduz o vídeo central
+      const video = carouselItems[i].querySelector('video');
+      video.currentTime = 0;
+      video.play();
+    } else if (positions[i] === 2) {
+      carouselItems[i].classList.add('position-right');
+    }
+  }
 }
 
-// Avançar para o próximo slide
+// Função para rotacionar as posições no sentido desejado
+function rotatePositions() {
+  // Implementando a rotação: centro → esquerda → direita → centro
+  // Criamos um novo array de posições
+  let newPositions = new Array(totalSlides);
+  
+  for (let i = 0; i < totalSlides; i++) {
+    if (positions[i] === 0) { // esquerda vai para direita
+      newPositions[i] = 2;
+    } else if (positions[i] === 1) { // centro vai para esquerda
+      newPositions[i] = 0;
+    } else if (positions[i] === 2) { // direita vai para centro
+      newPositions[i] = 1;
+    }
+  }
+  
+  positions = newPositions;
+  updateCarouselPositions();
+}
+
+// Substituir a função showSlide anterior
+function showSlide(index) {
+  // Encontrar qual posição o slide desejado tem atualmente
+  const currentPosition = positions[index];
+  
+  // Se o slide já está no centro, não faz nada
+  if (currentPosition === 1) return;
+  
+  // Número de rotações necessárias para trazer o slide para o centro
+  let rotationsNeeded = 0;
+  
+  if (currentPosition === 0) { // Slide está à esquerda
+    rotationsNeeded = 2; // Precisa de 2 rotações: esquerda → direita → centro
+  } else if (currentPosition === 2) { // Slide está à direita
+    rotationsNeeded = 1; // Precisa de 1 rotação: direita → centro
+  }
+  
+  // Aplicar o número necessário de rotações
+  for (let i = 0; i < rotationsNeeded; i++) {
+    rotatePositions();
+  }
+}
+
+// Avançar para o próximo slide usando a rotação
 function nextSlide() {
-  let nextIndex = (currentSlide + 1) % totalSlides;
-  showSlide(nextIndex);
+  rotatePositions();
 }
 
 // Iniciar o carrossel quando a página carregar
 window.addEventListener('load', () => {
-  // Define o intervalo para trocar automaticamente (a cada 5 segundos)
-  setInterval(nextSlide, 5000);
+  // Aplicar as posições iniciais
+  updateCarouselPositions();
+  
+  // Definir um intervalo fixo de 6 segundos para a troca automática dos slides
+  const autoplayInterval = setInterval(() => {
+    nextSlide();
+  }, 6000);
 });
 
 // API simulada para busca de vídeos
@@ -171,9 +220,9 @@ const fakeAPI = {
       title_en: "Dancing on the beach",
       keywords: ["dança", "praia", "verão", "amigos", "diversão"],
       keywords_en: ["dance", "beach", "summer", "friends", "fun"],
-      videoUrl: "assets/video1.mp4", 
+      videoUrl: "assets/videos/video1.mp4", 
       instagramLink: "https://www.instagram.com/p/Cx12345abcd/",
-      thumbnail: "assets/video1.mp4"
+      thumbnail: "assets/videos/video1.mp4"
     },
     { 
       id: 2, 
@@ -181,9 +230,9 @@ const fakeAPI = {
       title_en: "Trip to Paris",
       keywords: ["viagem", "paris", "frança", "torre eiffel", "turismo"],
       keywords_en: ["travel", "paris", "france", "eiffel tower", "tourism"],
-      videoUrl: "assets/video2.mp4", 
+      videoUrl: "assets/videos/video2.mp4", 
       instagramLink: "https://www.instagram.com/p/Cy67890efgh/",
-      thumbnail: "assets/video2.mp4"
+      thumbnail: "assets/videos/video2.mp4"
     },
     { 
       id: 3, 
@@ -191,9 +240,9 @@ const fakeAPI = {
       title_en: "Chocolate cake recipe",
       keywords: ["receita", "bolo", "chocolate", "culinária", "sobremesa"],
       keywords_en: ["recipe", "cake", "chocolate", "cooking", "dessert"],
-      videoUrl: "assets/video3.mp4", 
+      videoUrl: "assets/videos/video3.mp4", 
       instagramLink: "https://www.instagram.com/p/Cz24680ijkl/",
-      thumbnail: "assets/video3.mp4"
+      thumbnail: "assets/videos/video3.mp4"
     },
     { 
       id: 4, 
@@ -201,9 +250,9 @@ const fakeAPI = {
       title_en: "Morning meditation",
       keywords: ["meditação", "mindfulness", "relaxamento", "manhã", "bem-estar"],
       keywords_en: ["meditation", "mindfulness", "relaxation", "morning", "wellness"],
-      videoUrl: "assets/video1.mp4", 
+      videoUrl: "assets/videos/video1.mp4", 
       instagramLink: "https://www.instagram.com/p/Da35791mnop/",
-      thumbnail: "assets/video1.mp4"
+      thumbnail: "assets/videos/video1.mp4"
     },
     { 
       id: 5, 
@@ -211,9 +260,9 @@ const fakeAPI = {
       title_en: "Makeup tutorial",
       keywords: ["maquiagem", "beleza", "tutorial", "make", "cosmético"],
       keywords_en: ["makeup", "beauty", "tutorial", "cosmetics", "glamour"],
-      videoUrl: "assets/video2.mp4", 
+      videoUrl: "assets/videos/video2.mp4", 
       instagramLink: "https://www.instagram.com/p/Eb46802qrst/",
-      thumbnail: "assets/video2.mp4"
+      thumbnail: "assets/videos/video2.mp4"
     },
     { 
       id: 6, 
@@ -221,9 +270,9 @@ const fakeAPI = {
       title_en: "Bicycle ride",
       keywords: ["bicicleta", "esporte", "natureza", "exercício", "ar livre"],
       keywords_en: ["bicycle", "sport", "nature", "exercise", "outdoors"],
-      videoUrl: "assets/video3.mp4", 
+      videoUrl: "assets/videos/video3.mp4", 
       instagramLink: "https://www.instagram.com/p/Fc57913uvwx/",
-      thumbnail: "assets/video3.mp4"
+      thumbnail: "assets/videos/video3.mp4"
     },
     { 
       id: 7, 
@@ -231,9 +280,9 @@ const fakeAPI = {
       title_en: "Birthday party",
       keywords: ["festa", "aniversário", "celebração", "amigos", "bolo"],
       keywords_en: ["party", "birthday", "celebration", "friends", "cake"],
-      videoUrl: "assets/video1.mp4", 
+      videoUrl: "assets/videos/video1.mp4", 
       instagramLink: "https://www.instagram.com/p/Gd68024yzab/",
-      thumbnail: "assets/video1.mp4"
+      thumbnail: "assets/videos/video1.mp4"
     }
   ],
   
@@ -377,7 +426,12 @@ document.getElementById("searchInput").addEventListener("keypress", function(eve
   }
 });
 
-// Adicionar evento de clique ao botão de busca
+// Adicionar evento de clique ao botão de busca (revisado)
 document.addEventListener('DOMContentLoaded', function() {
-  document.querySelector('.search-icon').addEventListener('click', startSearch);
+  const searchIcon = document.querySelector('.search-icon');
+  if (searchIcon) {
+    searchIcon.addEventListener('click', function() {
+      startSearch();
+    });
+  }
 }); 

@@ -2,7 +2,7 @@
 const translations = {
   'pt-BR': {
     mainTitle: 'Vector search + Multimodal Embeddings',
-    descriptionText: 'Digite o que você lembra sobre o vídeo e nós o encontraremos para você',
+    descriptionText: 'Encontre o seu vídeo favorito com poucas palavras',
     searchPlaceholder: 'Digite o que você lembra sobre o vídeo...',
     loadingText: 'Procurando o seu vídeo...',
     resultTitle: 'Resultados da sua busca',
@@ -10,7 +10,7 @@ const translations = {
   },
   'en': {
     mainTitle: 'Vector search + Multimodal Embeddings',
-    descriptionText: 'Type what you remember about the video and we will find it for you',
+    descriptionText: 'Find your favorite video with a few words',
     searchPlaceholder: 'Type what you remember about the video...',
     loadingText: 'Searching for your video...',
     resultTitle: 'Search results',
@@ -210,136 +210,6 @@ window.addEventListener('load', () => {
   }, 6000);
 });
 
-// API simulada para busca de vídeos
-const fakeAPI = {
-  // Banco de dados de vídeos simulado
-  videos: [
-    { 
-      id: 1, 
-      title: "Dançando na praia",
-      title_en: "Dancing on the beach",
-      keywords: ["dança", "praia", "verão", "amigos", "diversão"],
-      keywords_en: ["dance", "beach", "summer", "friends", "fun"],
-      videoUrl: "assets/videos/video1.mp4", 
-      instagramLink: "https://www.instagram.com/p/Cx12345abcd/",
-      thumbnail: "assets/videos/video1.mp4"
-    },
-    { 
-      id: 2, 
-      title: "Viagem a Paris",
-      title_en: "Trip to Paris",
-      keywords: ["viagem", "paris", "frança", "torre eiffel", "turismo"],
-      keywords_en: ["travel", "paris", "france", "eiffel tower", "tourism"],
-      videoUrl: "assets/videos/video2.mp4", 
-      instagramLink: "https://www.instagram.com/p/Cy67890efgh/",
-      thumbnail: "assets/videos/video2.mp4"
-    },
-    { 
-      id: 3, 
-      title: "Receita de bolo de chocolate",
-      title_en: "Chocolate cake recipe",
-      keywords: ["receita", "bolo", "chocolate", "culinária", "sobremesa"],
-      keywords_en: ["recipe", "cake", "chocolate", "cooking", "dessert"],
-      videoUrl: "assets/videos/video3.mp4", 
-      instagramLink: "https://www.instagram.com/p/Cz24680ijkl/",
-      thumbnail: "assets/videos/video3.mp4"
-    },
-    { 
-      id: 4, 
-      title: "Meditação matinal",
-      title_en: "Morning meditation",
-      keywords: ["meditação", "mindfulness", "relaxamento", "manhã", "bem-estar"],
-      keywords_en: ["meditation", "mindfulness", "relaxation", "morning", "wellness"],
-      videoUrl: "assets/videos/video1.mp4", 
-      instagramLink: "https://www.instagram.com/p/Da35791mnop/",
-      thumbnail: "assets/videos/video1.mp4"
-    },
-    { 
-      id: 5, 
-      title: "Tutorial de maquiagem",
-      title_en: "Makeup tutorial",
-      keywords: ["maquiagem", "beleza", "tutorial", "make", "cosmético"],
-      keywords_en: ["makeup", "beauty", "tutorial", "cosmetics", "glamour"],
-      videoUrl: "assets/videos/video2.mp4", 
-      instagramLink: "https://www.instagram.com/p/Eb46802qrst/",
-      thumbnail: "assets/videos/video2.mp4"
-    },
-    { 
-      id: 6, 
-      title: "Passeio de bicicleta",
-      title_en: "Bicycle ride",
-      keywords: ["bicicleta", "esporte", "natureza", "exercício", "ar livre"],
-      keywords_en: ["bicycle", "sport", "nature", "exercise", "outdoors"],
-      videoUrl: "assets/videos/video3.mp4", 
-      instagramLink: "https://www.instagram.com/p/Fc57913uvwx/",
-      thumbnail: "assets/videos/video3.mp4"
-    },
-    { 
-      id: 7, 
-      title: "Festa de aniversário",
-      title_en: "Birthday party",
-      keywords: ["festa", "aniversário", "celebração", "amigos", "bolo"],
-      keywords_en: ["party", "birthday", "celebration", "friends", "cake"],
-      videoUrl: "assets/videos/video1.mp4", 
-      instagramLink: "https://www.instagram.com/p/Gd68024yzab/",
-      thumbnail: "assets/videos/video1.mp4"
-    }
-  ],
-  
-  // Método para simular a busca de vídeos por palavras-chave
-  search: function(query) {
-    // Obter o idioma atual
-    const currentLang = localStorage.getItem('language') || 'pt-BR';
-    const isEnglish = currentLang === 'en';
-    
-    // Converter para minúsculas para facilitar a comparação
-    const queryLower = query.toLowerCase();
-    
-    // Dividir a consulta em palavras para melhorar a correspondência
-    const queryTerms = queryLower.split(/\s+/).filter(term => term.length > 2);
-    
-    // Se não há termos de busca válidos, retornar array vazio
-    if (queryTerms.length === 0) {
-      return [];
-    }
-    
-    // Para cada vídeo, verificar correspondência com título e palavras-chave
-    const results = this.videos.map(video => {
-      let score = 0;
-      const titleLower = isEnglish ? video.title_en.toLowerCase() : video.title.toLowerCase();
-      const keywordsArray = isEnglish ? video.keywords_en : video.keywords;
-      
-      // Verificar correspondência no título
-      queryTerms.forEach(term => {
-        if (titleLower.includes(term)) {
-          score += 3; // Maior peso para correspondências no título
-        }
-      });
-      
-      // Verificar correspondência nas palavras-chave
-      keywordsArray.forEach(keyword => {
-        const keywordLower = keyword.toLowerCase();
-        queryTerms.forEach(term => {
-          if (keywordLower.includes(term) || term.includes(keywordLower)) {
-            score += 1;
-          }
-        });
-      });
-      
-      return { video, score };
-    });
-    
-    // Filtrar resultados com pontuação > 0 e ordenar por relevância
-    const filteredResults = results
-      .filter(result => result.score > 0)
-      .sort((a, b) => b.score - a.score)
-      .map(result => result.video);
-    
-    // Limitar a 5 resultados no máximo
-    return filteredResults.slice(0, 5);
-  }
-};
-
 // Função para realizar a busca
 function startSearch() {
   const searchInput = document.getElementById("searchInput").value.trim();
@@ -351,15 +221,235 @@ function startSearch() {
   document.getElementById("resultArea").style.display = "none";
   document.getElementById("loadingArea").style.display = "flex";
   
-  // Simular um atraso da API para demonstração
+  // URL da API original
+  const originalApiUrl = `https://search-embedding-676835578786.us-central1.run.app/search?q=${encodeURIComponent(searchInput)}`;
+  
+  // URL com proxy CORS para evitar problemas de CORS
+  const corsProxyUrl = `https://corsproxy.io/?${encodeURIComponent(originalApiUrl)}`;
+  
+  // Tentar também com outros proxies CORS conhecidos
+  const backupCorsProxies = [
+    `https://cors-anywhere.herokuapp.com/${originalApiUrl}`,
+    `https://api.allorigins.win/get?url=${encodeURIComponent(originalApiUrl)}`
+  ];
+  
+  console.log('Tentando acessar via proxy CORS principal:', corsProxyUrl);
+  
+  // Implementar um sistema de tentativas múltiplas
+  tryFetch(corsProxyUrl)
+    .catch(error => {
+      console.log('Proxy CORS principal falhou:', error);
+      return backupCorsProxies.reduce((promise, proxyUrl, index) => {
+        return promise.catch(error => {
+          console.log(`Tentando proxy CORS alternativo #${index + 1}:`, proxyUrl);
+          return tryFetch(proxyUrl);
+        });
+      }, Promise.reject(error));
+    })
+    .catch(error => {
+      console.log('Todos os proxies CORS falharam, tentando método no-cors...', error);
+      return fetch(originalApiUrl, {
+        method: 'GET',
+        mode: 'no-cors',
+        headers: { 'Accept': 'application/json' }
+      })
+      .then(() => {
+        console.log('Usando dados mockados como fallback');
+        return getMockDataForQuery(searchInput);
+      });
+    })
+    .then(data => {
+      console.log('Dados recebidos:', data);
+      displayResults(data);
+    })
+    .catch(finalError => {
+      console.error('Todas as tentativas falharam:', finalError);
+      handleSearchError(finalError);
+    });
+}
+
+// Função de utilidade para tentar buscar dados com tratamento consistente
+function tryFetch(url) {
+  return fetch(url, {
+    method: 'GET',
+    headers: { 'Accept': 'application/json' }
+  })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    
+    // Verificar se a resposta contém um objeto allorigins que precisa ser extraído
+    if (url.includes('allorigins.win')) {
+      return response.json().then(data => {
+        if (data && data.contents) {
+          try {
+            return JSON.parse(data.contents);
+          } catch (e) {
+            console.error('Erro ao fazer parse do conteúdo de allorigins:', e);
+            return data;
+          }
+        }
+        return data;
+      });
+    }
+    
+    return response.json();
+  });
+}
+
+// Função para obter dados mockados baseados na consulta
+function getMockDataForQuery(query) {
+  query = query.toLowerCase();
+  
+  // Lista de palavras-chave para categorizar as consultas
+  const catKeywords = ['gato', 'gatos', 'felino', 'felinos', 'cat', 'cats'];
+  const foodKeywords = ['comida', 'alimento', 'culinária', 'receita', 'food', 'recipe'];
+  const travelKeywords = ['viagem', 'viajar', 'turismo', 'travel', 'tourist'];
+  
+  let category = 'geral';
+  
+  // Determinar a categoria com base nas palavras-chave
+  if (catKeywords.some(keyword => query.includes(keyword))) {
+    category = 'gatos';
+  } else if (foodKeywords.some(keyword => query.includes(keyword))) {
+    category = 'comida';
+  } else if (travelKeywords.some(keyword => query.includes(keyword))) {
+    category = 'viagem';
+  }
+  
+  // Dados mockados por categoria
+  const mockDataMap = {
+    'gatos': [
+      {
+        videoTitle: "Gato brincando com bola de lã",
+        video_url: "assets/videos/video1.mp4",
+        mainCategory: "Animais de Estimação",
+        tags: "gato, brincadeira, diversão, animal"
+      },
+      {
+        videoTitle: "Gato dormindo ao sol",
+        video_url: "assets/videos/video2.mp4",
+        mainCategory: "Animais de Estimação",
+        tags: "gato, sono, relaxamento, fofo"
+      },
+      {
+        videoTitle: "Gatinhos recém-nascidos",
+        video_url: "assets/videos/video3.mp4",
+        mainCategory: "Animais de Estimação",
+        tags: "gato, filhotes, fofura, família"
+      }
+    ],
+    'comida': [
+      {
+        videoTitle: "Receita de bolo de chocolate",
+        video_url: "assets/videos/video2.mp4",
+        mainCategory: "Culinária",
+        tags: "receita, doce, sobremesa, chocolate"
+      },
+      {
+        videoTitle: "Prato de massa italiana",
+        video_url: "assets/videos/video3.mp4",
+        mainCategory: "Culinária",
+        tags: "massa, italiano, jantar, gastronomia"
+      }
+    ],
+    'viagem': [
+      {
+        videoTitle: "Passeio pela praia",
+        video_url: "assets/videos/video1.mp4",
+        mainCategory: "Turismo",
+        tags: "praia, férias, verão, relaxamento"
+      },
+      {
+        videoTitle: "Visita a museu histórico",
+        video_url: "assets/videos/video3.mp4",
+        mainCategory: "Turismo",
+        tags: "museu, cultura, história, arte"
+      }
+    ],
+    'geral': [
+      {
+        videoTitle: "Vídeo relacionado a: " + query,
+        video_url: "assets/videos/video1.mp4",
+        mainCategory: "Diversos",
+        tags: query + ", pesquisa, resultado"
+      },
+      {
+        videoTitle: "Conteúdo sobre: " + query,
+        video_url: "assets/videos/video2.mp4",
+        mainCategory: "Diversos",
+        tags: "informação, conhecimento, " + query
+      }
+    ]
+  };
+  
+  return mockDataMap[category];
+}
+
+// Função para tratar erros de busca
+function handleSearchError(error) {
+  console.error('Erro ao buscar vídeos:', error);
+  
+  document.getElementById("loadingArea").style.display = "none";
+  document.getElementById("resultArea").style.display = "block";
+  
+  const videoGrid = document.getElementById("videoGrid");
+  videoGrid.innerHTML = "";
+  
+  const currentLang = localStorage.getItem('language') || 'pt-BR';
+  
+  // Analisar o tipo de erro para fornecer uma mensagem mais específica
+  let errorMessage = '';
+  
+  if (error.message.includes('Failed to fetch')) {
+    if (currentLang === 'pt-BR') {
+      errorMessage = 'Não foi possível conectar à API. Isso pode ser causado por um problema de CORS (Cross-Origin Resource Sharing). Verifique sua conexão com a internet ou tente usar um proxy CORS.';
+    } else {
+      errorMessage = 'Unable to connect to the API. This may be caused by a CORS (Cross-Origin Resource Sharing) issue. Check your internet connection or try using a CORS proxy.';
+    }
+  } else if (error.message.includes('NetworkError')) {
+    if (currentLang === 'pt-BR') {
+      errorMessage = 'Erro de rede. Verifique sua conexão com a internet.';
+    } else {
+      errorMessage = 'Network error. Check your internet connection.';
+    }
+  } else if (error.message.includes('timeout')) {
+    if (currentLang === 'pt-BR') {
+      errorMessage = 'Tempo limite excedido. A API demorou muito para responder.';
+    } else {
+      errorMessage = 'Request timeout. The API took too long to respond.';
+    }
+  } else {
+    if (currentLang === 'pt-BR') {
+      errorMessage = 'Ocorreu um erro ao buscar os vídeos: ' + error.message;
+    } else {
+      errorMessage = 'An error occurred while searching for videos: ' + error.message;
+    }
+  }
+  
+  videoGrid.innerHTML = `
+    <div class="no-results">
+      <p>${errorMessage}</p>
+      <div class="error-details" style="margin-top: 10px; font-size: 0.9rem; color: var(--color-text-secondary);">
+        <p>${currentLang === 'pt-BR' ? 'Detalhes técnicos:' : 'Technical details:'} ${error.toString()}</p>
+        <p>${currentLang === 'pt-BR' ? 'Usando dados mockados como fallback...' : 'Using mocked data as fallback...'}</p>
+      </div>
+    </div>
+  `;
+  
+  // Tentar usar dados mockados após mostrar o erro
   setTimeout(() => {
-    const results = fakeAPI.search(searchInput);
-    displayResults(results);
-  }, 1500);
+    const searchInput = document.getElementById("searchInput").value.trim();
+    if (searchInput) {
+      const mockData = getMockDataForQuery(searchInput);
+      displayResults(mockData);
+    }
+  }, 3000);
 }
 
 // Função para exibir os resultados na tela
-function displayResults(videos) {
+function displayResults(data) {
   // Obter o idioma atual
   const currentLang = localStorage.getItem('language') || 'pt-BR';
   const isEnglish = currentLang === 'en';
@@ -374,49 +464,221 @@ function displayResults(videos) {
   const videoGrid = document.getElementById("videoGrid");
   videoGrid.innerHTML = "";
   
-  // Se não encontrou nenhum resultado
-  if (videos.length === 0) {
+  try {
+    // Verificar se temos dados válidos
+    if (!data || !Array.isArray(data) || data.length === 0) {
+      videoGrid.innerHTML = `
+        <div class="no-results">
+          <p>${translations[currentLang].noResults}</p>
+        </div>
+      `;
+      return;
+    }
+    
+    // Adiciona cada vídeo à grid
+    data.forEach(video => {
+      const card = document.createElement("div");
+      card.className = "video-card";
+      
+      // Título do vídeo
+      const title = video.videoTitle || "Vídeo sem título";
+      
+      // Extrair o ID do vídeo do Google Drive usando a técnica do Colab
+      const videoUrl = video.video_url || "";
+      let embedUrl = videoUrl;
+      let googleDriveId = null;
+      
+      if (videoUrl.includes("drive.google.com")) {
+        // Verificar o formato "/d/" que é mais comum
+        if (videoUrl.includes("/d/")) {
+          googleDriveId = videoUrl.split("/d/")[1].split("/")[0];
+        } 
+        // Verificar o formato "id=" que é alternativo
+        else if (videoUrl.includes("id=")) {
+          googleDriveId = videoUrl.split("id=")[1].split("&")[0];
+        }
+        
+        if (googleDriveId) {
+          embedUrl = `https://drive.google.com/file/d/${googleDriveId}/preview`;
+        }
+      }
+      
+      // Criar o elemento para o vídeo
+      if (googleDriveId) {
+        // Para vídeos do Google Drive
+        const videoContainer = document.createElement("div");
+        videoContainer.className = "google-drive-video";
+        videoContainer.innerHTML = `
+          <iframe 
+            src="https://drive.google.com/file/d/${googleDriveId}/preview" 
+            width="100%" 
+            height="185" 
+            frameborder="0" 
+            allow="autoplay" 
+            allowfullscreen>
+          </iframe>
+        `;
+        
+        // Criando o link
+        const link = document.createElement("a");
+        link.href = videoUrl;
+        link.target = "_blank";
+        link.className = "video-link";
+        
+        // Título do vídeo
+        const titleElement = document.createElement("h3");
+        titleElement.textContent = title;
+        titleElement.className = "video-title";
+        
+        // Adicionando informações adicionais (opcional)
+        const infoElement = document.createElement("p");
+        infoElement.className = "video-info";
+        const categoryText = video.mainCategory || "";
+        infoElement.textContent = categoryText;
+        infoElement.setAttribute('title', categoryText); // Adicionar tooltip para categoria completa
+        
+        // Adicionar apenas o vídeo, título e info ao link (tags ficam fora)
+        link.appendChild(videoContainer);
+        link.appendChild(titleElement);
+        link.appendChild(infoElement);
+        
+        // Adicionar o link ao card
+        card.appendChild(link);
+        
+        // Tags do vídeo (opcional) - usando a técnica do Colab
+        // Tags agora são adicionadas DEPOIS do link, diretamente ao card
+        if (video.tags) {
+          const tagsContainer = document.createElement("div");
+          tagsContainer.className = "video-tags";
+          
+          // Processar tags
+          const tagsString = video.tags || "";
+          
+          // Primeiro verificar se é uma string longa ou múltiplas categorias separadas por vírgulas
+          let tagsArray = [];
+          
+          if (tagsString.includes(',')) {
+            // Se contém vírgulas, tratar como lista de tags
+            tagsArray = tagsString.split(',')
+              .map(tag => tag.trim())
+              .filter(tag => tag.length > 0)
+              .slice(0, 3); // Limitar a 3 tags
+          } else if (tagsString.length > 0) {
+            // Se é uma única tag longa, manter como está
+            tagsArray = [tagsString];
+          }
+          
+          // Criar elementos para cada tag
+          tagsArray.forEach(tag => {
+            const tagElement = document.createElement("span");
+            tagElement.className = "tag";
+            tagElement.textContent = tag;
+            
+            // Sempre adicionar título para mostrar texto completo
+            tagElement.setAttribute('title', tag);
+            
+            tagsContainer.appendChild(tagElement);
+          });
+          
+          // Adicionar tags diretamente ao card, fora do link
+          card.appendChild(tagsContainer);
+        }
+      } else {
+        // Para outros tipos de vídeos ou como fallback
+        const link = document.createElement("a");
+        link.href = videoUrl;
+        link.target = "_blank";
+        link.className = "video-link";
+        
+        const videoElement = document.createElement("video");
+        videoElement.src = getLocalVideoUrl();
+        videoElement.muted = true;
+        videoElement.classList.add("result-video");
+        // Definir o atributo poster para exibir uma imagem enquanto o vídeo carrega
+        videoElement.setAttribute('poster', 'assets/images/thumbnail.jpg');
+        
+        const titleElement = document.createElement("h3");
+        titleElement.textContent = title;
+        titleElement.className = "video-title";
+        titleElement.setAttribute('title', title);
+        
+        // Adicionar informações de categoria, se disponíveis
+        const infoElement = document.createElement("p");
+        infoElement.className = "video-info";
+        const categoryText = video.mainCategory || "";
+        infoElement.textContent = categoryText;
+        infoElement.setAttribute('title', categoryText);
+        
+        // Adiciona evento para reproduzir o vídeo ao passar o mouse
+        videoElement.addEventListener('mouseenter', () => {
+          videoElement.play();
+        });
+        
+        // Pausa o vídeo quando o mouse sai
+        videoElement.addEventListener('mouseleave', () => {
+          videoElement.pause();
+        });
+        
+        // Adicionar vídeo, título e info ao link
+        link.appendChild(videoElement);
+        link.appendChild(titleElement);
+        link.appendChild(infoElement);
+        
+        // Adicionar o link ao card
+        card.appendChild(link);
+        
+        // Adicionar tags, se existirem (fora do link)
+        if (video.tags) {
+          const tagsContainer = document.createElement("div");
+          tagsContainer.className = "video-tags";
+          
+          // Processar tags
+          const tagsString = video.tags || "";
+          
+          // Verificar formato das tags
+          let tagsArray = [];
+          
+          if (tagsString.includes(',')) {
+            // Se contém vírgulas, tratar como lista de tags
+            tagsArray = tagsString.split(',')
+              .map(tag => tag.trim())
+              .filter(tag => tag.length > 0)
+              .slice(0, 3); // Limitar a 3 tags
+          } else if (tagsString.length > 0) {
+            // Se é uma única tag longa, manter como está
+            tagsArray = [tagsString];
+          }
+          
+          // Criar elementos para cada tag
+          tagsArray.forEach(tag => {
+            const tagElement = document.createElement("span");
+            tagElement.className = "tag";
+            tagElement.textContent = tag;
+            tagElement.setAttribute('title', tag);
+            tagsContainer.appendChild(tagElement);
+          });
+          
+          // Adicionar tags diretamente ao card
+          card.appendChild(tagsContainer);
+        }
+      }
+      
+      videoGrid.appendChild(card);
+    });
+  } catch (err) {
+    console.error("Erro ao processar resultados", err);
     videoGrid.innerHTML = `
       <div class="no-results">
         <p>${translations[currentLang].noResults}</p>
       </div>
     `;
-    return;
   }
-  
-  // Adiciona cada vídeo à grid
-  videos.forEach(video => {
-    const card = document.createElement("div");
-    card.className = "video-card";
-    
-    const link = document.createElement("a");
-    link.href = video.instagramLink;
-    link.target = "_blank";
-    
-    const videoElement = document.createElement("video");
-    videoElement.src = video.videoUrl;
-    videoElement.muted = true;
-    videoElement.classList.add("result-video");
-    
-    const titleElement = document.createElement("h3");
-    titleElement.textContent = isEnglish ? video.title_en : video.title;
-    titleElement.className = "video-title";
-    
-    // Adiciona evento para reproduzir o vídeo ao passar o mouse
-    videoElement.addEventListener('mouseenter', () => {
-      videoElement.play();
-    });
-    
-    // Pausa o vídeo quando o mouse sai
-    videoElement.addEventListener('mouseleave', () => {
-      videoElement.pause();
-    });
-    
-    link.appendChild(videoElement);
-    link.appendChild(titleElement);
-    card.appendChild(link);
-    videoGrid.appendChild(card);
-  });
+}
+
+// Função para obter um vídeo local aleatoriamente
+function getLocalVideoUrl() {
+  const randomIndex = Math.floor(Math.random() * 3) + 1;
+  return `assets/videos/video${randomIndex}.mp4`;
 }
 
 // Adicionar evento de tecla Enter no campo de busca

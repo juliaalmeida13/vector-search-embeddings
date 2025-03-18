@@ -70,10 +70,10 @@
     }
 
     .splash-spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid var(--color-input-bg);
-      border-top: 4px solid var(--color-accent);
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--color-input-bg);
+      border-top: 3px solid var(--color-accent);
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -304,10 +304,10 @@
     }
 
     .spinner {
-      width: 50px;
-      height: 50px;
-      border: 4px solid var(--color-input-bg);
-      border-top: 4px solid var(--color-accent);
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--color-input-bg);
+      border-top: 3px solid var(--color-accent);
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
@@ -321,14 +321,18 @@
     .result-area {
       display: none;
       margin-top: 30px;
+      width: 100%;
+      max-width: 1200px;
     }
 
     /* Grade de vídeos */
     .video-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 25px;
       margin-top: 20px;
+      width: 100%;
+      justify-content: center;
     }
 
     /* Cards de vídeo */
@@ -336,29 +340,37 @@
       background: var(--color-card-bg);
       border-radius: 15px;
       overflow: hidden;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px var(--color-shadow);
-      position: relative;
+      box-shadow: 0 8px 20px var(--color-shadow);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      padding: 18px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      width: 100%;
+      min-height: 450px;
     }
 
     .video-card:hover {
       transform: translateY(-5px);
-      box-shadow: 0 10px 25px var(--color-shadow-accent);
-      border: 2px solid var(--color-accent);
+      box-shadow: 0 12px 30px var(--color-shadow-accent);
     }
 
     .video-card a {
       display: block;
       text-decoration: none;
       color: inherit;
+      width: 100%;
+      margin-bottom: 8px;
     }
 
     .video-card video {
       width: 100%;
-      aspect-ratio: 16/9;
+      aspect-ratio: 9/16; /* Aspecto 1080x1920 */
       object-fit: cover;
       border-radius: 12px;
       cursor: pointer;
+      max-height: 360px; /* Altura máxima para não ficar muito grande */
     }
 
     .result-video {
@@ -367,17 +379,113 @@
 
     /* Título do vídeo no card */
     .video-title {
-      font-size: 1rem;
-      padding: 12px;
-      margin: 0;
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin: 12px 0 6px 0;
       color: var(--color-text);
+      line-height: 1.4;
       text-align: center;
-      font-weight: 500;
-      transition: color 0.3s ease;
+      height: auto;
+      min-height: 2.8em;
+      max-height: 4.2em;
+      overflow: hidden;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      text-overflow: ellipsis;
+      width: 100%;
+      padding: 0 5px;
     }
 
     .video-card:hover .video-title {
       color: var(--color-accent);
+    }
+
+    /* Video info e tags */
+    .video-info {
+      font-size: 0.85rem;
+      color: var(--color-text-secondary);
+      margin: 5px 0 10px 0;
+      opacity: 0.9;
+      text-align: center;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+      padding: 0 10px;
+      /* Permitir até três linhas para descrições mais longas */
+      white-space: normal;
+      line-height: 1.4;
+      height: auto;
+      min-height: 2.4em;
+      max-height: 4.2em;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+    }
+
+    /* Estilos para as tags de vídeo */
+    .video-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 10px;
+      justify-content: center;
+      min-height: 26px;
+      width: 100%;
+      padding: 0 10px;
+    }
+
+    .tag {
+      background-color: var(--color-accent);
+      color: white;
+      font-size: 0.75rem;
+      padding: 5px 12px;
+      border-radius: 15px;
+      white-space: normal; /* Permitir quebra de linha dentro da tag */
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 95%; /* Quase a largura do container */
+      min-width: 50px;
+      display: inline-block;
+      transition: all 0.2s ease;
+      cursor: default; /* Indica que não é clicável */
+      margin-bottom: 6px; /* Espaço entre tags em várias linhas */
+      line-height: 1.2;
+      min-height: 24px;
+      max-height: 48px; /* Altura máxima para 2 linhas */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
+
+    /* Estilo para mostrar texto truncado em tooltip */
+    .tag:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Permite que tags se expandam ao passar o mouse quando estiverem truncadas */
+    .tag.truncated {
+      position: relative;
+    }
+
+    .tag.truncated:hover {
+      overflow: visible;
+      z-index: 10;
+    }
+
+    .tag.truncated:hover::after {
+      content: attr(data-full-text);
+      position: absolute;
+      left: 0;
+      top: -30px;
+      background-color: var(--color-accent-light);
+      color: white;
+      padding: 5px 10px;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
     }
 
     /* Mensagem de nenhum resultado */
@@ -396,6 +504,33 @@
     }
 
     /* Responsividade */
+    @media (min-width: 1201px) {
+      .video-grid {
+        grid-template-columns: repeat(4, 1fr);
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    @media (max-width: 1200px) and (min-width: 901px) {
+      .video-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media (max-width: 900px) and (min-width: 601px) {
+      .video-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .video-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 768px) {
       .carousel {
         gap: 4px;
@@ -522,4 +657,66 @@
       color: var(--color-text-secondary);
       margin-bottom: 20px;
       max-width: 600px;
+    }
+
+    /* Estilos para vídeos do Google Drive */
+    .google-drive-video {
+      width: 100%;
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      background-color: var(--color-bg-secondary);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      aspect-ratio: 9/16; /* Aspecto 1080x1920 */
+      max-height: 360px; /* Altura máxima para não ficar muito grande */
+    }
+
+    .google-drive-video iframe {
+      border-radius: 12px;
+      border: none;
+      transition: all 0.3s ease;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .google-drive-thumbnail {
+      width: 100%;
+      height: 185px;
+      border-radius: 12px;
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .video-card .play-button {
+      width: 50px;
+      height: 50px;
+      background-color: rgba(147, 112, 219, 0.8);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .video-card .play-button:hover {
+      background-color: var(--color-accent);
+      transform: scale(1.1);
+    }
+
+    .video-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
     }

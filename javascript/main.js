@@ -222,7 +222,7 @@ function startSearch() {
   document.getElementById("loadingArea").style.display = "flex";
   
   // URL da API original
-  const originalApiUrl = `https://search-embedding-676835578786.us-central1.run.app/search?q=${encodeURIComponent(searchInput)}`;
+  const originalApiUrl = `https://search-teste-676835578786.us-central1.run.app/search?q=${encodeURIComponent(searchInput)}`;
   
   // URL com proxy CORS para evitar problemas de CORS
   const corsProxyUrl = `https://corsproxy.io/?${encodeURIComponent(originalApiUrl)}`;
@@ -236,20 +236,20 @@ function startSearch() {
   console.log('Tentando acessar via proxy CORS principal:', corsProxyUrl);
   
   // Implementar um sistema de tentativas múltiplas
-  tryFetch(corsProxyUrl)
+  tryFetch(corsProxyUrl, 'POST')
     .catch(error => {
       console.log('Proxy CORS principal falhou:', error);
       return backupCorsProxies.reduce((promise, proxyUrl, index) => {
         return promise.catch(error => {
           console.log(`Tentando proxy CORS alternativo #${index + 1}:`, proxyUrl);
-          return tryFetch(proxyUrl);
+          return tryFetch(proxyUrl, 'POST');
         });
       }, Promise.reject(error));
     })
     .catch(error => {
       console.log('Todos os proxies CORS falharam, tentando método no-cors...', error);
       return fetch(originalApiUrl, {
-        method: 'GET',
+        method: 'POST',
         mode: 'no-cors',
         headers: { 'Accept': 'application/json' }
       })
@@ -269,10 +269,13 @@ function startSearch() {
 }
 
 // Função de utilidade para tentar buscar dados com tratamento consistente
-function tryFetch(url) {
+function tryFetch(url, method = 'GET') {
   return fetch(url, {
-    method: 'GET',
-    headers: { 'Accept': 'application/json' }
+    method: method,
+    headers: { 
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    }
   })
   .then(response => {
     if (!response.ok) {
@@ -294,97 +297,11 @@ function tryFetch(url) {
       });
     }
     
-    return response.json();
+    return response.json().then(data => {
+      console.log('Resposta da API:', data);
+      return data;
+    });
   });
-}
-
-// Função para obter dados mockados baseados na consulta
-function getMockDataForQuery(query) {
-  query = query.toLowerCase();
-  
-  // Lista de palavras-chave para categorizar as consultas
-  const catKeywords = ['gato', 'gatos', 'felino', 'felinos', 'cat', 'cats'];
-  const foodKeywords = ['comida', 'alimento', 'culinária', 'receita', 'food', 'recipe'];
-  const travelKeywords = ['viagem', 'viajar', 'turismo', 'travel', 'tourist'];
-  
-  let category = 'geral';
-  
-  // Determinar a categoria com base nas palavras-chave
-  if (catKeywords.some(keyword => query.includes(keyword))) {
-    category = 'gatos';
-  } else if (foodKeywords.some(keyword => query.includes(keyword))) {
-    category = 'comida';
-  } else if (travelKeywords.some(keyword => query.includes(keyword))) {
-    category = 'viagem';
-  }
-  
-  // Dados mockados por categoria
-  const mockDataMap = {
-    'gatos': [
-      {
-        videoTitle: "Gato brincando com bola de lã",
-        video_url: "assets/videos/video1.mp4",
-        mainCategory: "Animais de Estimação",
-        tags: "gato, brincadeira, diversão, animal"
-      },
-      {
-        videoTitle: "Gato dormindo ao sol",
-        video_url: "assets/videos/video2.mp4",
-        mainCategory: "Animais de Estimação",
-        tags: "gato, sono, relaxamento, fofo"
-      },
-      {
-        videoTitle: "Gatinhos recém-nascidos",
-        video_url: "assets/videos/video3.mp4",
-        mainCategory: "Animais de Estimação",
-        tags: "gato, filhotes, fofura, família"
-      }
-    ],
-    'comida': [
-      {
-        videoTitle: "Receita de bolo de chocolate",
-        video_url: "assets/videos/video2.mp4",
-        mainCategory: "Culinária",
-        tags: "receita, doce, sobremesa, chocolate"
-      },
-      {
-        videoTitle: "Prato de massa italiana",
-        video_url: "assets/videos/video3.mp4",
-        mainCategory: "Culinária",
-        tags: "massa, italiano, jantar, gastronomia"
-      }
-    ],
-    'viagem': [
-      {
-        videoTitle: "Passeio pela praia",
-        video_url: "assets/videos/video1.mp4",
-        mainCategory: "Turismo",
-        tags: "praia, férias, verão, relaxamento"
-      },
-      {
-        videoTitle: "Visita a museu histórico",
-        video_url: "assets/videos/video3.mp4",
-        mainCategory: "Turismo",
-        tags: "museu, cultura, história, arte"
-      }
-    ],
-    'geral': [
-      {
-        videoTitle: "Vídeo relacionado a: " + query,
-        video_url: "assets/videos/video1.mp4",
-        mainCategory: "Diversos",
-        tags: query + ", pesquisa, resultado"
-      },
-      {
-        videoTitle: "Conteúdo sobre: " + query,
-        video_url: "assets/videos/video2.mp4",
-        mainCategory: "Diversos",
-        tags: "informação, conhecimento, " + query
-      }
-    ]
-  };
-  
-  return mockDataMap[category];
 }
 
 // Função para tratar erros de busca
@@ -448,231 +365,160 @@ function handleSearchError(error) {
   }, 3000);
 }
 
-// Função para exibir os resultados na tela
-function displayResults(data) {
-  // Obter o idioma atual
-  const currentLang = localStorage.getItem('language') || 'pt-BR';
-  const isEnglish = currentLang === 'en';
+// Função para obter dados mockados baseados na consulta
+function getMockDataForQuery(query) {
+  query = query.toLowerCase();
   
-  // Esconde o loading
-  document.getElementById("loadingArea").style.display = "none";
+  // Lista de palavras-chave para categorizar as consultas
+  const catKeywords = ['gato', 'gatos', 'felino', 'felinos', 'cat', 'cats'];
+  const foodKeywords = ['comida', 'alimento', 'culinária', 'receita', 'food', 'recipe'];
+  const travelKeywords = ['viagem', 'viajar', 'turismo', 'travel', 'tourist'];
   
-  // Mostra a área de resultados
-  document.getElementById("resultArea").style.display = "block";
+  let category = 'geral';
   
-  // Limpa os resultados anteriores
-  const videoGrid = document.getElementById("videoGrid");
-  videoGrid.innerHTML = "";
-  
-  try {
-    // Verificar se temos dados válidos
-    if (!data || !Array.isArray(data) || data.length === 0) {
-      videoGrid.innerHTML = `
-        <div class="no-results">
-          <p>${translations[currentLang].noResults}</p>
-        </div>
-      `;
-      return;
-    }
-    
-    // Adiciona cada vídeo à grid
-    data.forEach(video => {
-      const card = document.createElement("div");
-      card.className = "video-card";
-      
-      // Título do vídeo
-      const title = video.videoTitle || "Vídeo sem título";
-      
-      // Extrair o ID do vídeo do Google Drive usando a técnica do Colab
-      const videoUrl = video.video_url || "";
-      let embedUrl = videoUrl;
-      let googleDriveId = null;
-      
-      if (videoUrl.includes("drive.google.com")) {
-        // Verificar o formato "/d/" que é mais comum
-        if (videoUrl.includes("/d/")) {
-          googleDriveId = videoUrl.split("/d/")[1].split("/")[0];
-        } 
-        // Verificar o formato "id=" que é alternativo
-        else if (videoUrl.includes("id=")) {
-          googleDriveId = videoUrl.split("id=")[1].split("&")[0];
-        }
-        
-        if (googleDriveId) {
-          embedUrl = `https://drive.google.com/file/d/${googleDriveId}/preview`;
-        }
-      }
-      
-      // Criar o elemento para o vídeo
-      if (googleDriveId) {
-        // Para vídeos do Google Drive
-        const videoContainer = document.createElement("div");
-        videoContainer.className = "google-drive-video";
-        videoContainer.innerHTML = `
-          <iframe 
-            src="https://drive.google.com/file/d/${googleDriveId}/preview" 
-            width="100%" 
-            height="185" 
-            frameborder="0" 
-            allow="autoplay" 
-            allowfullscreen>
-          </iframe>
-        `;
-        
-        // Criando o link
-        const link = document.createElement("a");
-        link.href = videoUrl;
-        link.target = "_blank";
-        link.className = "video-link";
-        
-        // Título do vídeo
-        const titleElement = document.createElement("h3");
-        titleElement.textContent = title;
-        titleElement.className = "video-title";
-        
-        // Adicionando informações adicionais (opcional)
-        const infoElement = document.createElement("p");
-        infoElement.className = "video-info";
-        const categoryText = video.mainCategory || "";
-        infoElement.textContent = categoryText;
-        infoElement.setAttribute('title', categoryText); // Adicionar tooltip para categoria completa
-        
-        // Adicionar apenas o vídeo, título e info ao link (tags ficam fora)
-        link.appendChild(videoContainer);
-        link.appendChild(titleElement);
-        link.appendChild(infoElement);
-        
-        // Adicionar o link ao card
-        card.appendChild(link);
-        
-        // Tags do vídeo (opcional) - usando a técnica do Colab
-        // Tags agora são adicionadas DEPOIS do link, diretamente ao card
-        if (video.tags) {
-          const tagsContainer = document.createElement("div");
-          tagsContainer.className = "video-tags";
-          
-          // Processar tags
-          const tagsString = video.tags || "";
-          
-          // Primeiro verificar se é uma string longa ou múltiplas categorias separadas por vírgulas
-          let tagsArray = [];
-          
-          if (tagsString.includes(',')) {
-            // Se contém vírgulas, tratar como lista de tags
-            tagsArray = tagsString.split(',')
-              .map(tag => tag.trim())
-              .filter(tag => tag.length > 0)
-              .slice(0, 3); // Limitar a 3 tags
-          } else if (tagsString.length > 0) {
-            // Se é uma única tag longa, manter como está
-            tagsArray = [tagsString];
-          }
-          
-          // Criar elementos para cada tag
-          tagsArray.forEach(tag => {
-            const tagElement = document.createElement("span");
-            tagElement.className = "tag";
-            tagElement.textContent = tag;
-            
-            // Sempre adicionar título para mostrar texto completo
-            tagElement.setAttribute('title', tag);
-            
-            tagsContainer.appendChild(tagElement);
-          });
-          
-          // Adicionar tags diretamente ao card, fora do link
-          card.appendChild(tagsContainer);
-        }
-      } else {
-        // Para outros tipos de vídeos ou como fallback
-        const link = document.createElement("a");
-        link.href = videoUrl;
-        link.target = "_blank";
-        link.className = "video-link";
-        
-        const videoElement = document.createElement("video");
-        videoElement.src = getLocalVideoUrl();
-        videoElement.muted = true;
-        videoElement.classList.add("result-video");
-        // Definir o atributo poster para exibir uma imagem enquanto o vídeo carrega
-        videoElement.setAttribute('poster', 'assets/images/thumbnail.jpg');
-        
-        const titleElement = document.createElement("h3");
-        titleElement.textContent = title;
-        titleElement.className = "video-title";
-        titleElement.setAttribute('title', title);
-        
-        // Adicionar informações de categoria, se disponíveis
-        const infoElement = document.createElement("p");
-        infoElement.className = "video-info";
-        const categoryText = video.mainCategory || "";
-        infoElement.textContent = categoryText;
-        infoElement.setAttribute('title', categoryText);
-        
-        // Adiciona evento para reproduzir o vídeo ao passar o mouse
-        videoElement.addEventListener('mouseenter', () => {
-          videoElement.play();
-        });
-        
-        // Pausa o vídeo quando o mouse sai
-        videoElement.addEventListener('mouseleave', () => {
-          videoElement.pause();
-        });
-        
-        // Adicionar vídeo, título e info ao link
-        link.appendChild(videoElement);
-        link.appendChild(titleElement);
-        link.appendChild(infoElement);
-        
-        // Adicionar o link ao card
-        card.appendChild(link);
-        
-        // Adicionar tags, se existirem (fora do link)
-        if (video.tags) {
-          const tagsContainer = document.createElement("div");
-          tagsContainer.className = "video-tags";
-          
-          // Processar tags
-          const tagsString = video.tags || "";
-          
-          // Verificar formato das tags
-          let tagsArray = [];
-          
-          if (tagsString.includes(',')) {
-            // Se contém vírgulas, tratar como lista de tags
-            tagsArray = tagsString.split(',')
-              .map(tag => tag.trim())
-              .filter(tag => tag.length > 0)
-              .slice(0, 3); // Limitar a 3 tags
-          } else if (tagsString.length > 0) {
-            // Se é uma única tag longa, manter como está
-            tagsArray = [tagsString];
-          }
-          
-          // Criar elementos para cada tag
-          tagsArray.forEach(tag => {
-            const tagElement = document.createElement("span");
-            tagElement.className = "tag";
-            tagElement.textContent = tag;
-            tagElement.setAttribute('title', tag);
-            tagsContainer.appendChild(tagElement);
-          });
-          
-          // Adicionar tags diretamente ao card
-          card.appendChild(tagsContainer);
-        }
-      }
-      
-      videoGrid.appendChild(card);
-    });
-  } catch (err) {
-    console.error("Erro ao processar resultados", err);
-    videoGrid.innerHTML = `
-      <div class="no-results">
-        <p>${translations[currentLang].noResults}</p>
-      </div>
-    `;
+  // Determinar a categoria com base nas palavras-chave
+  if (catKeywords.some(keyword => query.includes(keyword))) {
+    category = 'gatos';
+  } else if (foodKeywords.some(keyword => query.includes(keyword))) {
+    category = 'comida';
+  } else if (travelKeywords.some(keyword => query.includes(keyword))) {
+    category = 'viagem';
   }
+  
+  // Dados mockados por categoria
+  const mockDataMap = {
+    'gatos': [
+      {
+        videoTitle: "Gato brincando com bola de lã",
+        videoUrl: "assets/videos/video1.mp4",
+        mainCategory: ["Animais de Estimação"],
+        tags: ["gato", "brincadeira", "diversão", "animal"]
+      },
+      {
+        videoTitle: "Gato dormindo ao sol",
+        videoUrl: "assets/videos/video2.mp4",
+        mainCategory: ["Animais de Estimação"],
+        tags: ["gato", "sono", "relaxamento", "fofo"]
+      },
+      {
+        videoTitle: "Gatinhos recém-nascidos",
+        videoUrl: "assets/videos/video3.mp4",
+        mainCategory: ["Animais de Estimação"],
+        tags: ["gato", "filhotes", "fofura", "família"]
+      }
+    ],
+    'comida': [
+      {
+        videoTitle: "Receita de bolo de chocolate",
+        videoUrl: "assets/videos/video2.mp4",
+        mainCategory: ["Culinária"],
+        tags: ["receita", "doce", "sobremesa", "chocolate"]
+      },
+      {
+        videoTitle: "Prato de massa italiana",
+        videoUrl: "assets/videos/video3.mp4",
+        mainCategory: ["Culinária"],
+        tags: ["massa", "italiano", "jantar", "gastronomia"]
+      }
+    ],
+    'viagem': [
+      {
+        videoTitle: "Passeio pela praia",
+        videoUrl: "assets/videos/video1.mp4",
+        mainCategory: ["Turismo"],
+        tags: ["praia", "férias", "verão", "relaxamento"]
+      },
+      {
+        videoTitle: "Visita a museu histórico",
+        videoUrl: "assets/videos/video3.mp4",
+        mainCategory: ["Turismo"],
+        tags: ["museu", "cultura", "história", "arte"]
+      }
+    ],
+    'geral': [
+      {
+        videoTitle: "Vídeo relacionado a: " + query,
+        videoUrl: "assets/videos/video1.mp4",
+        mainCategory: ["Diversos"],
+        tags: [query, "pesquisa", "resultado"]
+      },
+      {
+        videoTitle: "Conteúdo sobre: " + query,
+        videoUrl: "assets/videos/video2.mp4",
+        mainCategory: ["Diversos"],
+        tags: ["informação", "conhecimento", query]
+      }
+    ]
+  };
+  
+  return mockDataMap[category];
+}
+
+// Função para exibir os resultados na tela
+function displayResults(videos) {
+  const videoGrid = document.querySelector('.video-grid');
+  videoGrid.innerHTML = '';
+
+  // Esconder a área de loading
+  document.getElementById("loadingArea").style.display = "none";
+
+  // Se não houver vídeos ou o array estiver vazio
+  if (!videos || videos.length === 0) {
+    const noResults = document.createElement("div");
+    noResults.className = "no-results";
+    noResults.innerHTML = `
+      <p>Nenhum vídeo encontrado para a sua busca</p>
+    `;
+    videoGrid.appendChild(noResults);
+    return;
+  }
+
+  // Se houver vídeos, exibe-os
+  videos.forEach(video => {
+    const card = document.createElement("div");
+    card.className = "video-card";
+    
+    // URL do vídeo
+    const videoUrl = video.videoUrl;
+    
+    // Criar o elemento para o vídeo
+    const link = document.createElement("a");
+    link.href = videoUrl;
+    link.target = "_blank";
+    link.className = "video-link";
+    
+    // Criar o elemento de vídeo
+    const videoElement = document.createElement("video");
+    videoElement.src = videoUrl;
+    videoElement.muted = true;
+    videoElement.controls = true;
+    videoElement.playsinline = true;
+    videoElement.setAttribute('webkit-playsinline', 'true');
+    videoElement.classList.add("result-video");
+    videoElement.setAttribute('poster', 'assets/images/thumbnail.jpg');
+    
+    // Adiciona evento para reproduzir o vídeo ao passar o mouse
+    videoElement.addEventListener('mouseenter', () => {
+      videoElement.play();
+    });
+    
+    // Pausa o vídeo quando o mouse sai
+    videoElement.addEventListener('mouseleave', () => {
+      videoElement.pause();
+    });
+    
+    // Adicionar vídeo ao link
+    link.appendChild(videoElement);
+    
+    // Adicionar o link ao card
+    card.appendChild(link);
+    
+    videoGrid.appendChild(card);
+  });
+
+  // Mostrar a área de resultados e esconder o loading
+  document.querySelector('.result-area').style.display = 'block';
+  document.getElementById("loadingArea").style.display = "none";
 }
 
 // Função para obter um vídeo local aleatoriamente
